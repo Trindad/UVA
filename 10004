@@ -1,0 +1,174 @@
+/*
+* ====================================================================================================
+*
+*                               BICOLORING
+* 
+* Nome do Arquivo: 10004.c
+*
+* Descrição: A entrada consiste de muitos casos de teste. Cada caso começa com uma linha contendo um
+*            número n ( 1 < n < 200) de diferentes nós. A segunda linha contém o número de arestas l.
+*            Depois disso, as l linhas seguintes possuirão dois números indicando que há uma aresta
+*            entre os dois nós numerados. Um nó no grafo será marcado com um número a ( ) .
+*
+* Data: 05/02/2014
+*
+* Autores: Silvana Trindade, Maurício A. Cinelli e Marivone Valentin
+* 
+* =====================================================================================================
+*/
+
+#include <stdio.h>  
+#include <string.h>  
+  
+#define MAX 200 /*número máximo de nós 1 < n < 200*/
+
+/**
+ * edge --> ligações entre os nós 
+ * degree --> grau do vértice
+ * visitedd --> vértice visitados
+ * visited --> aresta visitadas
+ * judge --> varivel de decisão se é ou não Bicolor o grafo caso for é 1 do contrario 0
+ */
+int edge[MAX][MAX];  
+int degree[MAX];  
+int visitedd[MAX];  
+int visited[MAX][MAX];  
+int judge;  
+
+void DFS(int n, int nu);
+
+int main(void)  
+{  
+    int i = 0;
+    int a, b;       /*vértices de ligação*/ 
+    int n,link;     /*numero de vértices e número de arestas do grafo*/ 
+
+    /**
+     * Decidir se grafo é Bicolor e imprimir.
+     * Uma entrada com n = 0 fim de laço.
+     * Inicializa judge como 0, assim como a matriz lu e o vetor num.
+     * Primeiro usuario digita numero de vértices depois número de arestas. 
+     */
+    while (scanf("%d", &n) != EOF && n)  
+    {  
+        judge = 0;
+
+        memset(edge, 0, sizeof(edge));  
+        memset(degree, 0, sizeof(degree));  
+
+        scanf("%d", &link); /*numero de arestas*/
+
+        /**
+         *  Ligações entre os nós é estabelecida
+         */
+        
+        for (i = 0; i < link; i ++)  
+        {  
+            
+            scanf("%d%d", &a, &b); 
+
+            /**
+             * Faz as ligações de a com b e b com a
+             */
+            
+            edge[a][degree[a]] = b;
+            edge[b][degree[b]] = a;  
+
+            /**
+             * Incrementa o grau dos vértices a e b.
+             */
+            degree[a]++; 
+            degree[b]++;   
+        } 
+
+        /**
+         * Verificação se grafo é Bicolor
+         *  Inicializa vetores visited e visitedd
+         */
+        
+        for (i = 0; i < n; i ++)  
+        {  
+            memset(visitedd, 0, sizeof(visitedd));  
+            memset(visited, 0, sizeof(visited));  
+
+            visitedd[i] = 1;  
+
+            DFS (i,1);  
+
+            if (judge)  
+            {  
+                printf("NOT BICOLORABLE.\n");  
+
+                break;  
+            }  
+        }
+        /**
+         * Não é Bicolor o grafo ou seja necessita de mais de duas cores para que os nós vizinhos sempre tenham cores distintas.
+         */
+        if (!judge) 
+        {
+            printf("BICOLORABLE.\n");  
+        } 
+            
+    }  
+
+    return 0;  
+}  
+
+/**
+ * [DFS Busca em Profundidade]
+ * @param n  [vértice de origem]
+ * @param nu [número de vértices visitados]
+ */
+void DFS(int n, int nu)  
+{  
+    int i;
+    /**
+     *  Percorre de 0 a numero de vértices ligados a n
+    */
+  
+    for (i = 0; i < degree[n]; i ++)  
+    {  
+        
+        /**
+         *  verifica se aresta foi visitada
+         */
+         
+        if (visited[n][edge[n][i]] == 0)  
+        {  
+            /**
+             * Se o vértice edge[n][i] já foi visitado
+             */
+            if (visitedd[edge[n][i]] == 1)  
+            {  
+                /*se o */
+                if (nu % 2)  
+                {  
+                    judge = 1; 
+                    return;  
+                }  
+                return;  
+            }  
+
+            /**
+             * Reset nas variaveis
+             */
+            visitedd[edge[n][i]] = 1;  
+            visited[n][edge[n][i]] = visited[edge[n][i]][n] = 1;
+
+            /**
+             * Passa o próximo vértice a ser verificado
+             * Vértice a ser verificado é o vizinho.
+            */
+            
+            DFS(edge[n][i], nu + 1);  
+
+            /**
+             * Reset nas variaveis
+             */
+            visitedd[edge[n][i]] = 0;  
+            visited[n][edge[n][i]] = visited[edge[n][i]][n] = 0;  
+        }  
+    }  
+}  
+  
